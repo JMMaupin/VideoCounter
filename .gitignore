@@ -1,0 +1,11 @@
+# Artefacts de compilation PyInstaller
+build/
+dist/
+*.spec
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Videos generees (sorties du script, pas des sources)
+*.mp4
