@@ -27,7 +27,7 @@ FONT_CANDIDATES = [
 MIN_HEIGHT_PX = 100
 MAX_HEIGHT_PX = 500
 DEFAULT_FPS = 30
-FPS_CHOICES = [24, 25, 30, 50, 60]
+FPS_CHOICES = [24, 25, 30, 50, 60, 120, 240, 1000]
 TEXT_HEIGHT_RATIO = 0.8  # le texte occupe 80% de la hauteur demandee
 
 
@@ -204,10 +204,10 @@ class CounterApp(tk.Tk):
             frm, from_=MIN_HEIGHT_PX, to=MAX_HEIGHT_PX, textvariable=self.height_var, width=6
         ).grid(row=3, column=1, sticky="w", **pad)
 
-        ttk.Label(frm, text="Frame rate (fps)").grid(row=4, column=0, sticky="w", **pad)
+        ttk.Label(frm, text="Frame rate (fps) - editable").grid(row=4, column=0, sticky="w", **pad)
         self.fps_var = tk.StringVar(value=str(DEFAULT_FPS))
         ttk.Combobox(
-            frm, values=[str(v) for v in FPS_CHOICES], textvariable=self.fps_var, width=6, state="readonly"
+            frm, values=[str(v) for v in FPS_CHOICES], textvariable=self.fps_var, width=6
         ).grid(row=4, column=1, sticky="w", **pad)
 
         ttk.Label(frm, text="Output folder").grid(row=5, column=0, sticky="w", **pad)
@@ -253,12 +253,15 @@ class CounterApp(tk.Tk):
             duration_s = self.hours_var.get() * 3600 + self.minutes_var.get() * 60 + self.seconds_var.get()
             height_px = self.height_var.get()
             fps = int(self.fps_var.get())
-        except tk.TclError:
+        except (tk.TclError, ValueError):
             messagebox.showerror("Erreur", "Merci de saisir des valeurs numeriques valides.")
             return
 
         if duration_s <= 0:
             messagebox.showerror("Erreur", "La duree doit etre superieure a 0.")
+            return
+        if fps <= 0:
+            messagebox.showerror("Erreur", "Le frame rate doit etre superieur a 0.")
             return
         if not (MIN_HEIGHT_PX <= height_px <= MAX_HEIGHT_PX):
             messagebox.showerror("Erreur", f"La hauteur doit etre comprise entre {MIN_HEIGHT_PX} et {MAX_HEIGHT_PX} px.")
