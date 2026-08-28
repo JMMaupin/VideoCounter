@@ -3,6 +3,7 @@
 import math
 import queue
 import subprocess
+import sys
 import threading
 import tkinter as tk
 from dataclasses import dataclass
@@ -28,6 +29,15 @@ MAX_HEIGHT_PX = 500
 DEFAULT_FPS = 30
 FPS_CHOICES = [24, 25, 30, 50, 60]
 TEXT_HEIGHT_RATIO = 0.8  # le texte occupe 80% de la hauteur demandee
+
+
+def app_dir() -> Path:
+    # Sous PyInstaller (onefile), __file__ pointe vers le dossier
+    # d'extraction temporaire (_MEIPASS), pas vers l'exe : il faut se baser
+    # sur sys.executable pour retrouver le dossier ou vit vraiment l'exe.
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent
 
 
 def find_font_path() -> str | None:
@@ -203,7 +213,7 @@ class CounterApp(tk.Tk):
         ttk.Label(frm, text="Output folder").grid(row=5, column=0, sticky="w", **pad)
         out_frame = ttk.Frame(frm)
         out_frame.grid(row=6, column=0, columnspan=2, sticky="we", **pad)
-        self.output_dir_var = tk.StringVar(value=str(Path(__file__).resolve().parent))
+        self.output_dir_var = tk.StringVar(value=str(app_dir()))
         ttk.Entry(out_frame, textvariable=self.output_dir_var, width=32).grid(row=0, column=0)
         ttk.Button(out_frame, text="Browse...", command=self._browse_output_dir).grid(row=0, column=1, padx=(6, 0))
 
@@ -234,7 +244,7 @@ class CounterApp(tk.Tk):
         self.filename_var.set(f"File name: {name}")
 
     def _browse_output_dir(self):
-        path = filedialog.askdirectory(initialdir=self.output_dir_var.get() or str(Path(__file__).resolve().parent))
+        path = filedialog.askdirectory(initialdir=self.output_dir_var.get() or str(app_dir()))
         if path:
             self.output_dir_var.set(path)
 
